@@ -2,7 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.h3llo.scoutx">
 
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the "MyLocation" functionality.
+    -->
+
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--  PERMISOS DE USO DE GPS -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location.gps"/>
 
     <application
         android:allowBackup="true"
@@ -12,8 +22,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ScoutX"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity"></activity>
-        <!-- HEY ESTO NO DEBE IR, DEBE ESTAR EN UN AMBIENTE HTTPS CON SSL, PASSWORD TRAVELS UNENCRYPTED -->
+
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDuybb1_uQuPo7K2FLVumKhDN3PWzWANac" />
+
+        <activity
+            android:name=".NavActivity"
+            android:label="@string/title_activity_nav"
+            android:theme="@style/Theme.ScoutX.NoActionBar" />
+        <activity android:name=".MainActivity" /> <!-- HEY ESTO NO DEBE IR, DEBE ESTAR EN UN AMBIENTE HTTPS CON SSL, PASSWORD TRAVELS UNENCRYPTED -->
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

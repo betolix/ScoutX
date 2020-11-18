@@ -204,7 +204,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), NavActivity.class));
 
 
 
@@ -233,7 +233,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         if (SharedPrefManager.getInstance(this).isLoggedIn()) {
             Log.d("TAG1", "Ya loggeado!!!");
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), NavActivity.class));
         }
     }
 
