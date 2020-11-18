@@ -28,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
@@ -36,6 +37,7 @@ import com.google.maps.android.data.geojson.GeoJsonPolygonStyle;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 // DEUDA TECNICA - INFO WINDOW
@@ -47,7 +49,7 @@ public class ExposureMapFragment extends Fragment {
     private ClusterManager<MyItem> mClusterManager;
     double latt, lonn;
     int checkseguir=0;
-
+    ArrayList<MyItem> myItems = new ArrayList<>();
 
 //    public void Seguir(View view) {
 //        Button btnseguir = findViewById(R.id.btnseguir);
@@ -88,34 +90,6 @@ public class ExposureMapFragment extends Fragment {
 //            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
             mapa = googleMap;
-            mapa.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-            mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-12.121510, -77.001477), 5)); // POSITION THE MAP
-
-            // mapa.setOnMapClickListener(this);
-            List<MyItem> items = null;
-
-//            //  INICIO COARSE LOCATION
-//            if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                mapa.setMyLocationEnabled(true);
-//                mapa.getUiSettings().setZoomControlsEnabled(false);
-//                mapa.getUiSettings().setCompassEnabled(true);
-//            }else {
-//                Button btnMiPos=(Button) findViewById(R.id.btnmiubi);
-//                btnMiPos.setEnabled(false);
-//            }
-//            // FIN DE COARSE LOCATION
-
-
-
-            // INICIO MAP CLUSTERING
-            mClusterManager = new ClusterManager<MyItem>(getContext(), mapa);
-
-            // Point the map's listeners at the listeners implemented by the cluster
-            // manager.
-            mapa.setOnCameraIdleListener(mClusterManager);
-            mapa.setOnMarkerClickListener(mClusterManager);
-
-
 
             /// GEOJSON START
             try{
@@ -172,7 +146,8 @@ public class ExposureMapFragment extends Fragment {
                                         feature.getProperty("VD 11-Total USD") + " ";
 
                         MyItem item = new MyItem(latt,lonn, title, snippet);
-                        mClusterManager.addItem(item);
+                        myItems.add(item);
+                        //  mClusterManager.addItem(item);
 
                     }
                     //items.add(new MyItem(Double.parseDouble(feature.getProperty("Latitud")),Double.parseDouble(feature.getProperty("Longitud")))); // convertir a double
@@ -187,6 +162,62 @@ public class ExposureMapFragment extends Fragment {
                 // String mLogTag;
                 // Log.e(mLogTag, "GeoJSON file could not be converted to JSONObject");
             }
+            mapa.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+            mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-12.121510, -77.001477), 5)); // POSITION THE MAP
+
+            // mapa.setOnMapClickListener(this);
+            List<MyItem> items = null;
+
+//            //  INICIO COARSE LOCATION
+//            if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//                mapa.setMyLocationEnabled(true);
+//                mapa.getUiSettings().setZoomControlsEnabled(false);
+//                mapa.getUiSettings().setCompassEnabled(true);
+//            }else {
+//                Button btnMiPos=(Button) findViewById(R.id.btnmiubi);
+//                btnMiPos.setEnabled(false);
+//            }
+//            // FIN DE COARSE LOCATION
+
+
+
+            // INICIO MAP CLUSTERING
+            mClusterManager = new ClusterManager<MyItem>(getContext(), mapa);
+
+            // Point the map's listeners at the listeners implemented by the cluster
+            // manager.
+            mapa.setOnCameraIdleListener(mClusterManager);
+            mapa.setOnMarkerClickListener(mClusterManager);
+
+            mClusterManager.setOnClusterClickListener(
+                    new ClusterManager.OnClusterClickListener<MyItem>() {
+                        @Override public boolean onClusterClick(Cluster<MyItem> cluster) {
+                            Toast.makeText(getActivity(), "Cluster pulsado", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    });
+            mClusterManager.setOnClusterItemClickListener(
+                    new ClusterManager.OnClusterItemClickListener<MyItem>() {
+                        @Override public boolean onClusterItemClick(MyItem clusterItem) {
+                            Toast.makeText(getActivity(), "Cluster item pulsado", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    });
+            mClusterManager.getMarkerCollection()
+                    .setInfoWindowAdapter(new CustomInfoViewAdapter(LayoutInflater.from(getActivity())));
+            mapa.setInfoWindowAdapter(mClusterManager.getMarkerManager());
+
+            mClusterManager.setOnClusterItemInfoWindowClickListener(
+                    new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem>() {
+                        @Override public void onClusterItemInfoWindowClick(MyItem stringClusterItem) {
+                            Toast.makeText(getActivity(), "Pulsaste el infowindow: " + stringClusterItem.getPosition().toString(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            mapa.setOnInfoWindowClickListener(mClusterManager);
+
+            mClusterManager.addItems(myItems);
+
 
 
             LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
